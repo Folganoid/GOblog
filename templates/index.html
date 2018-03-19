@@ -2,12 +2,13 @@
 
 {{ template "header" }}
 
+{{ range $key, $value := . }}
 <div class="container">
 <div class="row">
     <div class="col-2">
     </div>
     <div class="col-8">
-
+        <h2><a href="/edit?id={{$key}}">{{ $value.Title }}</a></h2>
     </div>
     <div class="col-2">
     </div>
@@ -16,12 +17,14 @@
     <div class="col-2">
     </div>
     <div class="col-8">
-
+        {{ $value.Content }}
     </div>
     <div class="col-2">
     </div>
 </div>
 </div>
+{{ end }}
+
 {{ template "footer" }}
 
 {{ end }}

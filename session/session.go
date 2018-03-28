@@ -2,38 +2,56 @@ package session
 
 import (
 	"../utils"
+	"github.com/codegangsta/martini"
+	"net/http"
+	"time"
 )
 
-type sessionData struct {
+const (
+	COOKIE_NAME = "sessionId"
+)
+
+type Session struct {
+	id       string
 	Username string
 }
 
-type Session struct {
-	data map[string]*sessionData
+type SessionStore struct {
+	data map[string]*Session
 }
 
-func NewSession() *Session {
-	s := new(Session)
-	s.data = make(map[string]*sessionData)
+func NewSessionStore() *SessionStore {
+	s := new(SessionStore)
+	s.data = make(map[string]*Session)
 
 	return s
 }
 
-func (s *Session) Init(username string) string {
+func (store *SessionStore) Get(sessionId string) *Session {
+}
 
+func (store *SessionStore) Set(session *Session) {
+}
+
+func ensureCookie(r *http.Request, w http.ResponseWriter) string {
+	cookie := r.Cookie(COOKIE_NAME)
+	if cookie != nil {
+		return cookie.Value
+	}
 	sessionId := utils.GenerateId()
-	data := &sessionData{Username: username}
-	s.data[sessionId] = data
+	cookie = &http.Cookie{
+		Name:    COOKIE_NAME,
+		Value:   sessionId,
+		Expires: time.Now().Add(5 * time.Minute),
+	}
+	http.SetCookie(w, cookie)
 
 	return sessionId
 }
 
-func (s *Session) Get(sessionId string) string {
-	data := s.data[sessionId]
+var sessionStore = NewSessionStore()
 
-	if data == nil {
-		return ""
-	}
-
-	return data.Username
+func Middleware(ctx martini.Context, r *http.Request, w http.ResponseWriter) {
+	sessionId := ensureCookie(r, w)
+	ctx.Next()
 }

@@ -1,34 +1,14 @@
 package routes
 
 import (
+	"../db/documents"
+	"../models"
 	"../utils"
-	"net/http"
-)
-
-import (
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
 	"labix.org/v2/mgo"
+	"net/http"
 )
-
-func PostLoginHandler(rnd render.Render, r *http.Request, w http.ResponseWriter) {
-	username := r.FormValue("username")
-	password := r.FormValue("password")
-
-	fmt.Printf(username)
-	fmt.Printf(password)
-
-	sessionId := inMemorySession.Init(username)
-
-	cookie := &http.Cookie{
-		Name:    COOKIE_NAME,
-		Value:   sessionId,
-		Expires: time.Now().Add(5 * time.Minute),
-	}
-
-	http.SetCookie(w, cookie)
-	rnd.Redirect("/")
-}
 
 func WriteHandler(rnd render.Render) {
 	post := models.Post{}
@@ -37,7 +17,7 @@ func WriteHandler(rnd render.Render) {
 
 func EditHandler(rnd render.Render, r *http.Request, params martini.Params, db *mgo.Database) {
 
-	postCollection := db.C("Posts")
+	postsCollection := db.C("posts")
 
 	id := params["id"]
 	postDocument := documents.PostDocument{}
@@ -53,7 +33,7 @@ func EditHandler(rnd render.Render, r *http.Request, params martini.Params, db *
 
 func SavePostHandler(rnd render.Render, r *http.Request, db *mgo.Database) {
 
-	postCollection := db.C("Posts")
+	postsCollection := db.C("posts")
 
 	id := r.FormValue("id")
 	title := r.FormValue("title")
@@ -74,7 +54,7 @@ func SavePostHandler(rnd render.Render, r *http.Request, db *mgo.Database) {
 
 func DeleteHandler(rnd render.Render, r *http.Request, params martini.Params, db *mgo.Database) {
 
-	postCollection := db.C("Posts")
+	postsCollection := db.C("posts")
 
 	id := params["id"]
 	if id == "" {

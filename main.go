@@ -1,25 +1,17 @@
 package main
 
 import (
-	"./db/documents"
-	"./models"
 	"./routes"
 	"./session"
-	"./utils"
 	"fmt"
-	"html/template"
-	"net/http"
-	"time"
-)
-
-import (
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
+	"html/template"
 	"labix.org/v2/mgo"
 )
 
 var postsCollection *mgo.Collection
-var inMemorySession *session.Session
+var inMemorySession *session.SessionStore
 
 func unescape(x string) interface{} {
 	return template.HTML(x)
@@ -28,20 +20,22 @@ func unescape(x string) interface{} {
 func main() {
 	fmt.Println("Listening on port :3000")
 
-	inMemorySession = session.NewSession()
+	inMemorySession = session.NewSessionStore()
 
-	session, err := mgo.Dial("localhost")
+	mongoSession, err := mgo.Dial("localhost")
 	if err != nil {
 		panic(err)
 	}
 
-	db = session.DB("blog")
+	db := mongoSession.DB("blog")
 
 	m := martini.Classic()
 
 	unescapeFuncMap := template.FuncMap{"unescape": unescape}
 
 	m.Map(db)
+
+	m.Use(session.Middleware)
 
 	m.Use(render.Renderer(render.Options{
 		Directory:  "templates",                         // Specify what path to load the templates from.

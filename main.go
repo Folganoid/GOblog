@@ -50,10 +50,12 @@ func main() {
 	m.Use(martini.Static("assets", staticOptions))
 	m.Get("/", routes.IndexHandler)
 	m.Get("/login", routes.GetLoginHandler)
+	m.Get("/logout", routes.LogoutHandler)
 	m.Post("/login", routes.PostLoginHandler)
 	m.Get("/write", routes.WriteHandler)
 	m.Post("/SavePost", routes.SavePostHandler)
 	m.Get("/edit/:id", routes.EditHandler)
+	m.Get("/view/:id", routes.ViewHandler)
 	m.Get("/delete/:id", routes.DeleteHandler)
 	m.Post("/gethtml", routes.GetHtmlHandler)
 
